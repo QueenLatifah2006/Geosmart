@@ -1,0 +1,35 @@
+name: geosmart
+description: Application de géolocalisation intelligente pour Ngaoundéré.
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  lucide_icons: ^0.257.0
+  google_fonts: ^4.0.0
+  image_picker: ^0.8.6 # For structure images
+  google_maps_flutter: ^2.2.1 # For 2D/Satellite maps
+  flutter_map: ^6.1.0 # Alternative for Mapbox
+  maplibre_gl: any
+  latlong2: ^0.9.1
+  geolocator: ^9.0.2 # For real-time location
+  flutter_polyline_points: ^3.1.0 # For route drawing
+  http: ^1.1.0
+  shared_preferences: ^2.2.1
+  google_generative_ai: ^0.4.0
+
+dependency_overrides:
+  maplibre_gl_web: any
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
