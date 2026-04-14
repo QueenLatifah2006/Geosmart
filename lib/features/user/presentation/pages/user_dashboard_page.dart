@@ -18,6 +18,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:maplibre_gl/maplibre_gl.dart' as ml;
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 
 // import 'package:flutter_map/flutter_map.dart'; // Removed
 // import 'package:latlong2/latlong.dart'; // Removed to avoid conflict
@@ -466,10 +467,14 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
   }
 
   void _onStyleLoaded() {
+    if (!mounted) return;
     setState(() {
       _isStyleLoaded = true;
     });
-    _addMarkers();
+    // Use post frame callback to ensure layout is complete before adding markers
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _addMarkers();
+    });
   }
 
   void _addMarkers() async {
@@ -523,22 +528,26 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    Widget content = Stack(
-      children: [
-        // MapLibre Map Integration
-        ml.MapLibreMap(
-          onMapCreated: _onMapCreated,
-          onStyleLoadedCallback: _onStyleLoaded,
-          initialCameraPosition: ml.CameraPosition(
-            target: ml.LatLng(7.32, 13.58),
-            zoom: 14.0,
-          ),
-          styleString: isDarkMode 
-            ? 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
-            : 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-          myLocationEnabled: true,
-          trackCameraPosition: true,
-        ),
+    Widget content = LayoutBuilder(
+      builder: (context, constraints) {
+        return Stack(
+          children: [
+            // MapLibre Map Integration
+            Positioned.fill(
+              child: ml.MapLibreMap(
+                onMapCreated: _onMapCreated,
+                onStyleLoadedCallback: _onStyleLoaded,
+                initialCameraPosition: ml.CameraPosition(
+                  target: ml.LatLng(7.32, 13.58),
+                  zoom: 14.0,
+                ),
+                styleString: isDarkMode 
+                  ? 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
+                  : 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+                myLocationEnabled: !kIsWeb,
+                trackCameraPosition: true,
+              ),
+            ),
         
         // Navigation Instructions Panel
         if (_isNavigating)
@@ -625,6 +634,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
         ),
       ],
     );
+  });
 
     if (widget.isMobile) {
       return Scaffold(
