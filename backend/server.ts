@@ -21,7 +21,7 @@ dotenv.config();
 
 console.log('Environment check:');
 console.log('- PORT:', process.env.PORT);
-console.log('- MONGODB_URI:', process.env.MONGODB_URI);
+console.log('- MONGODB_URI:', process.env.MONGODB_URI ? 'Set' : 'Not set');
 console.log('- GEMINI_API_KEY:', process.env.GEMINI_API_KEY ? 'Set' : 'Not set');
 console.log('- JWT_SECRET:', process.env.JWT_SECRET ? 'Set' : 'Not set');
 
@@ -30,7 +30,7 @@ const __dirname = path.dirname(__filename);
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = parseInt(process.env.PORT || '3000', 10);
 
   // Connect to MongoDB
   const mongoUri = process.env.MONGODB_URI;
@@ -53,6 +53,7 @@ async function startServer() {
 
   // Create uploads directory if it doesn't exist
   const uploadsDir = path.join(process.cwd(), 'uploads');
+  console.log('Uploads directory path:', uploadsDir);
   if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir);
   }
@@ -117,7 +118,13 @@ async function startServer() {
 
   // Global error handler
   app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.error('Unhandled error:', err);
+    console.error('Unhandled error details:', {
+      message: err.message,
+      stack: err.stack,
+      status: err.status,
+      path: req.path,
+      method: req.method
+    });
     res.status(err.status || 500).json({
       error: err.message || 'Internal Server Error',
       details: process.env.NODE_ENV === 'development' ? err.stack : undefined

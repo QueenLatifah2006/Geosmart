@@ -31,6 +31,7 @@ class NavigationPage extends StatefulWidget {
 class _NavigationPageState extends State<NavigationPage> {
   ml.LatLng? _currentPosition;
   ml.MapLibreMapController? _mapController;
+  bool _isStyleLoaded = false;
   final ApiService _apiService = ApiService();
   StreamSubscription<Position>? _positionSubscription;
   List<ml.LatLng> _routePoints = [];
@@ -145,13 +146,20 @@ class _NavigationPageState extends State<NavigationPage> {
 
   void _onMapCreated(ml.MapLibreMapController controller) {
     _mapController = controller;
+  }
+
+  void _onStyleLoaded() {
+    if (!mounted) return;
+    setState(() {
+      _isStyleLoaded = true;
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _addMarkers();
     });
   }
 
   void _addMarkers() async {
-    if (_mapController == null) return;
+    if (_mapController == null || !_isStyleLoaded) return;
     await _mapController!.clearSymbols();
     await _mapController!.clearLines();
 
@@ -253,6 +261,7 @@ class _NavigationPageState extends State<NavigationPage> {
               Positioned.fill(
                 child: ml.MapLibreMap(
                   onMapCreated: _onMapCreated,
+                  onStyleLoadedCallback: _onStyleLoaded,
                   initialCameraPosition: ml.CameraPosition(
                     target: _currentPosition ?? ml.LatLng(7.32, 13.58),
                     zoom: 15.0,
@@ -289,6 +298,7 @@ class _NavigationPageState extends State<NavigationPage> {
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
                                 'Tourner à droite dans 200m',

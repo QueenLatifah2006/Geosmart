@@ -146,6 +146,7 @@ class _ProfilePageState extends State<ProfilePage> {
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 'Mon Profil',
@@ -203,6 +204,7 @@ class _ProfilePageState extends State<ProfilePage> {
         borderRadius: BorderRadius.circular(24),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           if (widget.isMobile) ...[
             _buildMobileProfileHeader(isDarkMode),
@@ -260,6 +262,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildMobileProfileHeader(bool isDarkMode) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Stack(
           children: [
@@ -354,6 +357,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget _buildTextField(String label, TextEditingController controller, IconData icon, bool isDarkMode) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
         const SizedBox(height: 8),
@@ -430,6 +434,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget _buildDialogTextField(String label, TextEditingController controller, IconData icon, bool isDarkMode, {bool isPassword = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
         const SizedBox(height: 8),

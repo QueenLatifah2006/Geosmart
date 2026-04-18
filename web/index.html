@@ -8,6 +8,7 @@
   <meta name="description" content="GeoSmart Ngaoundéré">
 
   <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="geosmart">
@@ -20,8 +21,28 @@
   <link rel="manifest" href="manifest.json">
 
   <!-- MapLibre GL JS -->
-  <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@2.4.0/dist/maplibre-gl.js"></script>
-  <link href="https://cdn.jsdelivr.net/npm/maplibre-gl@2.4.0/dist/maplibre-gl.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@2.1.9/dist/maplibre-gl.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/maplibre-gl@2.1.9/dist/maplibre-gl.css" rel="stylesheet" />
+  <script>
+    // Patch for MapLibre _getUIString error on Web
+    window.addEventListener('load', function() {
+      if (typeof maplibregl !== 'undefined') {
+        const originalControl = maplibregl.NavigationControl;
+        if (originalControl && originalControl.prototype) {
+          if (!originalControl.prototype._getUIString) {
+            originalControl.prototype._getUIString = function(key) { return key; };
+          }
+        }
+        // Also patch GeolocateControl which is likely the cause
+        const geoControl = maplibregl.GeolocateControl;
+        if (geoControl && geoControl.prototype) {
+          if (!geoControl.prototype._getUIString) {
+            geoControl.prototype._getUIString = function(key) { return key; };
+          }
+        }
+      }
+    });
+  </script>
 
   <!-- This script adds the flutter initialization JS code -->
   <script src="flutter.js" defer></script>
@@ -29,30 +50,18 @@
 <body>
   <script>
     window.addEventListener('load', function(ev) {
-      // Use the new load() API if buildConfig is available, otherwise fallback to loadEntrypoint()
-      if (_flutter.loader.load && _flutter.buildConfig) {
-        _flutter.loader.load({
-          serviceWorker: {
-            serviceWorkerVersion: '{{flutter_service_worker_version}}',
-          },
-          onEntrypointLoaded: function(engineInitializer) {
-            engineInitializer.initializeEngine().then(function(appRunner) {
-              appRunner.runApp();
-            });
-          }
-        });
-      } else {
-        _flutter.loader.loadEntrypoint({
-          serviceWorker: {
-            serviceWorkerVersion: '{{flutter_service_worker_version}}',
-          },
-          onEntrypointLoaded: function(engineInitializer) {
-            engineInitializer.initializeEngine().then(function(appRunner) {
-              appRunner.runApp();
-            });
-          }
-        });
-      }
+      // Use loadEntrypoint which is more compatible across Flutter 3.x versions
+      // while avoiding the strict buildConfig requirement of the newer load() API
+      _flutter.loader.loadEntrypoint({
+        serviceWorker: {
+          serviceWorkerVersion: '{{flutter_service_worker_version}}',
+        },
+        onEntrypointLoaded: function(engineInitializer) {
+          engineInitializer.initializeEngine().then(function(appRunner) {
+            appRunner.runApp();
+          });
+        }
+      });
     });
   </script>
 </body>

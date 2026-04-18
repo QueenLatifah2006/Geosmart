@@ -69,14 +69,14 @@ class _RoutePlanningPageState extends State<RoutePlanningPage> {
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         const Text('Destination', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                        Flexible(
-                          child: Text(
-                            widget.destination['name'],
-                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                        Text(
+                          widget.destination['name'],
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
@@ -119,6 +119,7 @@ class _RoutePlanningPageState extends State<RoutePlanningPage> {
                     opacity: isSelected ? 0.2 : 0.05,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
                           mode['icon'],
